@@ -15,6 +15,7 @@ function toggleSignIn(email, password){
 	}
 }
 
+// Send Email verification
 function sendEmailVerification() {
 	firebase.auth().currentUser.sendEmailVerification().then(function() {
         	Shiny.onInputChange("firebase_alert", "Email Verification Sent!");
