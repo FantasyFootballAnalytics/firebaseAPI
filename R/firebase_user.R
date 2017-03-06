@@ -37,12 +37,15 @@ firebase_user <- R6::R6Class(
     register = function(email, password){
       shinyjs::runjs(paste0("handleSignUp('", email, "', '", password, "');"))
     },
+    delete = function(){
+      shinyjs::runjs("deleteUser();")
+    },
 
     signIn = function(password){
       shinyjs::runjs(paste0("toggleSignIn('", self$email, "', '", password, "');"))
     },
     signOut = function(){
-      shinyjs::runjs("toggleSignIn(null, null);")
+      shinyjs::runjs("toggleSignIn();")
     },
     verifyEmail = function(){
       shinyjs::runjs("sendEmailVerification();")
@@ -77,6 +80,11 @@ updateUser <- function(displayName = NULL, email = NULL, emailVerified = NULL,
 }
 
 #' @export
+deleteUser <- function(){
+  firebaseUser$delete()
+}
+
+#' @export
 registerUser <- function(email, password){
   firebaseUser$register(email, password)
 }
@@ -100,4 +108,10 @@ getUser <- function(){
 #' @export
 updatePassword <- function(oldPassword, newPassword){
   firebaseUser$updatePassword(newPassword, oldPassword)
+}
+
+
+#' @export
+updateEmail <- function(newEmail){
+  firebaseUser$updateEmail(newEmail)
 }

@@ -1,12 +1,20 @@
+// Handle sign in and log out
 function toggleSignIn(email, password){
-    if (firebase.auth().currentUser) {
+  var noparam = (email === undefined && password === undefined);
+  if (firebase.auth().currentUser && noparam) {
       firebase.auth().signOut();
       Shiny.onInputChange("firebase_user", null);
+      Shiny.onInputChange("firebase_alert", "Signed out");
     } else {
       firebase.auth().signInWithEmailAndPassword(email, password).then(function(){
         var newUser = firebase.auth().currentUser.toJSON();
-        Shiny.onInputChange("firebase_user", newUser);
-        Shiny.onInputChange("firebase_alert", "Sign In successful");
+        if(newUser.emailVerified){
+          Shiny.onInputChange("firebase_user", newUser);
+          Shiny.onInputChange("firebase_alert", "Sign In successful");
+        } else {
+          Shiny.onInputChange("firebase_user", null);
+          Shiny.onInputChange("firebase_alert", "Please verify email to sign in");
+        }
       }).catch(function(error) {
         var auth_error = JSON.stringify(error);
         Shiny.onInputChange("auth_error", auth_error);
@@ -22,11 +30,13 @@ function sendEmailVerification() {
       });
 }
 
+// Handle registrations
 function handleSignUp(email, password) {
   firebase.auth().createUserWithEmailAndPassword(email, password).then(function(){
     sendEmailVerification();
     var newUser = firebase.auth().currentUser.toJSON();
-		Shiny.onInputChange("firebase_user", newUser);
+    Shiny.onInputChange("firebase_alert", "Please verify email to sign in");
+		Shiny.onInputChange("firebase_user", null);
   }).catch(function(error) {
     var auth_error = JSON.stringify(error);
 		Shiny.onInputChange("auth_error", auth_error);
@@ -47,9 +57,9 @@ function sendPasswordReset(email) {
 function updateEmail(newEmail){
 	var user = firebase.auth().currentUser;
 	user.updateEmail(newEmail).then(function() {
+	  sendEmailVerification();
 	  user.reload();
-		var updatedUser = user.toJSON();
-		Shiny.onInputChange("firebase_user", updatedUser);
+		Shiny.onInputChange("firebase_user", null);
 		Shiny.onInputChange("firebase_alert", "Email updated!");
 		}, function(error) {
 			var auth_error = JSON.stringify(error);
@@ -77,17 +87,31 @@ function updatePassword(newPassword, oldPassword){
 	});
 }
 
-function initApp() {
-	firebase.auth().onAuthStateChanged(function(user) {
-	  if (user) {
-	    var fb_user = user.toJSON();
-	    Shiny.onInputChange("firebase_user", fb_user);
-	  } else {
-	    Shiny.onInputChange("firebase_user", null);
-	  }
-});
+function deleteUser() {
+  var confDelete = confirm("Your account will be deleted. This action cannot be undone!");
+  if(confDelete){
+    var user = firebase.auth().currentUser;
+    user.delete();
+    Shiny.onInputChange("firebase_user", null);
+    Shiny.onInputChange("firebase_alert", "Account Deleted");
+  }
 }
 
-window.onLoad = function() {
-	initApp();
-};
+//function initApp() {
+//	firebase.auth().onAuthStateChanged(function(user) {
+//	  if (user) {
+//	    var fb_user = user.toJSON();
+//	    Shiny.onInputChange("firebase_user", fb_user);
+//	  } else {
+//	    Shiny.onInputChange("firebase_user", null);
+//	  }
+//	});
+//}
+
+//window.onload = function() {
+//	initApp();
+//};
+
+
+
+

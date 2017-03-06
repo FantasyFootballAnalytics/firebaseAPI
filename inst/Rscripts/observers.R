@@ -16,7 +16,6 @@ observe({
  if(is.null(input$auth_error))
    return()
   error <- jsonlite::fromJSON(input$auth_error)
-  print(error)
   error_msg <- error$message
   shiny::showNotification(error_msg, type = "error")
 })
