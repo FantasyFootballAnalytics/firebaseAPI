@@ -31,6 +31,7 @@ firebase_user <- R6::R6Class(
       self$providerData <- providerData
       self$providerId <- providerId
       self$refreshToken <- refreshToken
+      self$uid <- uid
       invisible(self)
     },
 
@@ -50,8 +51,8 @@ firebase_user <- R6::R6Class(
     verifyEmail = function(){
       shinyjs::runjs("sendEmailVerification();")
     },
-    resetPassword =  function(){
-      shinyjs::runjs(paste0("sendPasswordReset('", self$email, "');"))
+    resetPassword =  function(email){
+      shinyjs::runjs(paste0("sendPasswordReset('", email, "');"))
     },
     updateEmail = function(newEmail){
       shinyjs::runjs(paste0("updateEmail('", newEmail, "');"))
@@ -68,6 +69,7 @@ firebaseUser <- firebase_user$new()
 updateUser <- function(displayName = NULL, email = NULL, emailVerified = NULL,
                        isAnonymous = NULL, photoURL = NULL, providerData = NULL,
                        providerId = NULL, refreshToken = NULL, uid = NULL){
+
     firebaseUser$displayName <- displayName
     firebaseUser$email <- email
     firebaseUser$emailVerified <- emailVerified
@@ -76,7 +78,8 @@ updateUser <- function(displayName = NULL, email = NULL, emailVerified = NULL,
     firebaseUser$providerData <- providerData
     firebaseUser$providerId <- providerId
     firebaseUser$refreshToken <- refreshToken
-    firebase_user$uid <- uid
+    firebaseUser$uid <- uid
+
 }
 
 #' @export

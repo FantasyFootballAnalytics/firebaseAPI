@@ -1,11 +1,13 @@
 
 
 observe({
+
   if(is.null(input$firebase_user)){
     updateUser()
   } else {
     user_fields <- intersect(names(firebase_user$public_fields),
                              names(input$firebase_user))
+
     fb_user <- input$firebase_user[user_fields]
     do.call("updateUser", as.list(fb_user))
   }
