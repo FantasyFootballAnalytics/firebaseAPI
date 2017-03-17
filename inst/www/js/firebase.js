@@ -107,6 +107,13 @@ function deleteUser() {
   }
 }
 
+function getCurrentUser(){
+  var user = firebase.auth().currentUser;
+  if(user)
+    Shiny.onInputChange("firebase_user", user.toJSON());
+  else
+    Shiny.onInputChange("firebase_user", null);
+}
 //function initApp() {
 //	firebase.auth().onAuthStateChanged(function(user) {
 //	  if (user) {
